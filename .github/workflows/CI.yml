@@ -8,7 +8,7 @@ jobs:
     env:
       POWERSHELL_TELEMETRY_OPTOUT: 1
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
       with:
         fetch-depth: 0
     - name: Build
@@ -16,10 +16,10 @@ jobs:
     - name: Prepare artifacts
       run: |
         cp -R pack bsnes\out\
-        cp README.md bsnes\out\pack\readme.md
+        cp README.md bsnes\out\pack
         cp bsnes\out\bsnes.exe bsnes\out\pack\bsnes_hd.exe
     - name: Upload artifacts
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: bsnes_hd_beta_X_windows
         path: bsnes\out\pack
@@ -30,19 +30,18 @@ jobs:
     env:
       POWERSHELL_TELEMETRY_OPTOUT: 1
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
       with:
         fetch-depth: 0
     - name: Build
       run: mingw32-make -j $env:NUMBER_OF_PROCESSORS -C bsnes target=libretro
     - name: Prepare artifacts
       run: |
-        mkdir bsnes/out/pack
-        cp README.md bsnes/out/pack
-        cp LICENSE bsnes/out/pack
+        mkdir -p bsnes/out/pack
+        cp README.md LICENSE bsnes/out/pack
         cp -R bsnes/out/*bsnes* bsnes/out/pack
     - name: Upload artifacts
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: bsnes_hd_beta_X_windows_libretro
         path: bsnes\out\pack
@@ -51,7 +50,7 @@ jobs:
   Linux:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
       with:
         fetch-depth: 0
     - name: Setup
@@ -66,11 +65,11 @@ jobs:
         cp README.md bsnes/out/pack/readme.md
         cp bsnes/out/bsnes bsnes/out/pack/bsnes_hd
         chmod +x bsnes/out/pack/bsnes_hd
-        mkdir bsnes/out/tar
+        mkdir -p bsnes/out/tar
         cd bsnes/out/pack
         tar -jcvpf ../tar/bsnes_hd_beta_X_linux.tar.bz2 *
     - name: Upload artifacts
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: UNPACK-LINUX
         path: bsnes/out/tar
@@ -79,7 +78,7 @@ jobs:
   Linux-libretro:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
       with:
         fetch-depth: 0
     - name: Setup
@@ -90,12 +89,11 @@ jobs:
       run: make -j $(nproc) -C bsnes target=libretro
     - name: Prepare artifacts
       run: |
-        mkdir bsnes/out/pack
-        cp README.md bsnes/out/pack
-        cp LICENSE bsnes/out/pack
+        mkdir -p bsnes/out/pack
+        cp README.md LICENSE bsnes/out/pack
         cp -R bsnes/out/*bsnes* bsnes/out/pack
     - name: Upload artifacts
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: bsnes_hd_beta_X_linux_libretro
         path: bsnes/out/pack
@@ -104,7 +102,7 @@ jobs:
   Linux-ARM-libretro:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
       with:
         fetch-depth: 0
     - name: add foreign arch
@@ -133,12 +131,11 @@ jobs:
         wget https://raw.githubusercontent.com/libretro/libretro-super/master/retrolink.sh && chmod +x retrolink.sh && ./retrolink.sh bsnes/out/bsnes_hd_beta_libretro.so
     - name: Prepare artifacts
       run: |
-        mkdir bsnes/out/pack
-        cp README.md bsnes/out/pack
-        cp LICENSE bsnes/out/pack
+        mkdir -p bsnes/out/pack
+        cp README.md LICENSE bsnes/out/pack
         cp -R bsnes/out/*bsnes* bsnes/out/pack
     - name: Upload artifacts
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: bsnes_hd_beta_X_linux_arm_libretro
         path: bsnes/out/pack
@@ -147,26 +144,25 @@ jobs:
   macOS:
     runs-on: macos-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
       with:
         fetch-depth: 0
     - name: Build
       run: |
         export MACOSX_DEPLOYMENT_TARGET=10.14
-        make -j $(sysctl -n hw.ncpu) -C bsnes
+        make -j $(getconf _NPROCESSORS_ONLN) -C bsnes
     - name: Prepare artifacts
       run: |
-        mkdir bsnes/out/pack
-        cp LICENSE bsnes/out/pack
-        cp README.md bsnes/out/pack
+        mkdir -p bsnes/out/pack
+        cp LICENSE README.md bsnes/out/pack
         cp -R bsnes/out/*bsnes* bsnes/out/pack
         mv bsnes/out/pack/bsnes.app bsnes/out/pack/bsnes_hd.app
         chmod +x bsnes/out/pack/bsnes_hd.app/Contents/MacOS/bsnes
-        mkdir bsnes/out/tar
+        mkdir -p bsnes/out/tar
         cd bsnes/out/pack
         tar -jcvpf ../tar/bsnes_hd_beta_X_mac.tar.bz2 *
     - name: Upload artifacts
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: UNPACK-MAC
         path: bsnes/out/tar
@@ -175,21 +171,20 @@ jobs:
   macOS-libretro:
     runs-on: macos-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
       with:
         fetch-depth: 0
     - name: Build
       run: |
         export MACOSX_DEPLOYMENT_TARGET=10.14
-        make -j $(sysctl -n hw.ncpu) -C bsnes target=libretro
+        make -j $(getconf _NPROCESSORS_ONLN) -C bsnes target=libretro
     - name: Prepare artifacts
       run: |
-        mkdir bsnes/out/pack
-        cp README.md bsnes/out/pack
-        cp LICENSE bsnes/out/pack
+        mkdir -p bsnes/out/pack
+        cp README.md LICENSE bsnes/out/pack
         cp -R bsnes/out/*bsnes* bsnes/out/pack
     - name: Upload artifacts
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: bsnes_hd_beta_X_mac_libretro
         path: bsnes/out/pack
@@ -198,7 +193,7 @@ jobs:
   Android-libretro:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
       with:
         fetch-depth: 0
     - uses: nttld/setup-ndk@v1
@@ -208,11 +203,10 @@ jobs:
       run: |
         cd bsnes/target-libretro/jni
         ndk-build
-        cd ../../..
-        cp README.md bsnes/target-libretro/libs
-        cp LICENSE bsnes/target-libretro/libs
+        cd -
+        cp README.md LICENSE bsnes/target-libretro/libs
     - name: Upload artifacts
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: bsnes_hd_beta_X_android_libretro
         path: bsnes/target-libretro/libs
